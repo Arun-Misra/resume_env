@@ -1,0 +1,26 @@
+# Secrets — never bake into the image
+.env
+
+# Exclude the Windows virtual environment — uv will create a fresh Linux one during build
+.venv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Development artifacts
+*.log
+screening_log.txt
+
+# Editor / OS
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# netsol_raw is large — only include if you want it baked into the image
+# (leave commented out to keep image small and mount at runtime instead)
+# server/netsol_raw/
