@@ -1,3 +1,13 @@
+---
+title: Resume Env
+emoji: 📄
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # AI Resume Screener: OpenEnv Environment
 
 ## Overview
@@ -36,7 +46,7 @@ The environment provides three distinct difficulty levels:
 | **Hard** | Adversarial | Includes "junk" resumes, gibberish text, and candidates who try to game the criteria. |
 
 ## Reward Function
-The environment uses a programmatic grader that evaluates accuracy against GPT-4 verified ground-truth:
+The environment uses a programmatic grader that evaluates accuracy against verified ground-truth:
 - **Correct Decision**: +1.0 reward.
 - **Incorrect Decision**: 0.0 reward.
 - **Adversarial Failure**: -0.5 penalty (only in `hard` mode) if the agent shortlists a gibberish resume.
