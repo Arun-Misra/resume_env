@@ -40,26 +40,24 @@ def grade_binary_screen(scenario: dict, candidate_decision: str, candidate_reaso
     # Normalize expected: if GPT-4 said flag_for_review, we accept either shortlist or reject
     # based on which side of the threshold the score falls
     if expected == "flag_for_review":
-        # These borderline cases are excluded from binary_screen (handled in loader)
-        # If somehow one slips through, accept any non-flag decision
         if agent == "flag_for_review":
-            reward   = -0.5
-            feedback = f"Penalty: flag_for_review is not allowed in binary_screen task. Commit to a decision."
+            reward   = 0.1  # Low reward instead of negative penalty
+            feedback = f"Hedged with flag_for_review. Commit to a decision in binary_screen."
         else:
-            reward   = 0.5  # Partial credit for committing to a close call
+            reward   = 0.5  # Partial credit
             feedback = f"Acceptable. Borderline case — committed to '{agent}'."
         return {"reward": float(reward), "is_correct": False, "feedback": feedback}
 
     is_correct = (agent == expected)
 
     if is_correct:
-        reward   = 1.0
-        feedback = f"Correct. Decisive {expected} decision. Ground Truth: {scenario['rationale']}"
+        reward   = 0.95  # Slightly less than 1.0
+        feedback = f"Correct identifying {expected}. Ground Truth: {scenario['rationale']}"
     elif agent == "flag_for_review":
-        reward   = -0.5
-        feedback = f"Penalty: flag_for_review is not allowed in binary_screen. Should be '{expected}'. Ground Truth: {scenario['rationale']}"
+        reward   = 0.1  # Low reward for hedging
+        feedback = f"Hedged with flag_for_review in binary_screen. Ground Truth: {scenario['rationale']}"
     else:
-        reward   = 0.0
+        reward   = 0.05  # Slightly more than 0.0
         feedback = f"Incorrect. Expected '{expected}', chose '{agent}'. Ground Truth: {scenario['rationale']}"
 
     return {"reward": float(reward), "is_correct": is_correct, "feedback": feedback}
@@ -80,14 +78,14 @@ def grade_full_screen(scenario: dict, candidate_decision: str, candidate_reasoni
     is_correct = (agent == expected)
 
     if is_correct:
-        reward   = 1.0
-        feedback = f"Correct. The ideal decision was {expected}. Ground Truth: {scenario['rationale']}"
+        reward   = 0.95
+        feedback = f"Correct decision: {expected}. Ground Truth: {scenario['rationale']}"
     elif agent == "flag_for_review":
-        reward   = -0.1
-        feedback = f"Incorrect. Expected '{expected}', but you hedged with flag_for_review. Ground Truth: {scenario['rationale']}"
+        reward   = 0.1
+        feedback = f"Incorrect. You hedged with flag_for_review. Ground Truth: {scenario['rationale']}"
     else:
-        reward   = 0.0
-        feedback = f"Incorrect. Expected '{expected}', chose '{agent}'. Ground Truth: {scenario['rationale']}"
+        reward   = 0.05
+        feedback = f"Incorrect decision. Expected '{expected}', chose '{agent}'. Ground Truth: {scenario['rationale']}"
 
     return {"reward": float(reward), "is_correct": is_correct, "feedback": feedback}
 
@@ -110,25 +108,20 @@ def grade_adversarial_screen(scenario: dict, candidate_decision: str, candidate_
     is_correct = (agent == expected)
 
     if is_correct:
-        if is_gibber:
-            reward   = 1.0
-            feedback = f"Correct. Detected and rejected gibberish submission. Ground Truth: {scenario['rationale']}"
-        else:
-            reward   = 1.0
-            feedback = f"Correct. '{expected}' decision. Ground Truth: {scenario['rationale']}"
+        reward   = 0.95
+        feedback = f"Correct identifying {expected}. Ground Truth: {scenario['rationale']}"
 
     elif is_gibber and agent != "reject":
-        # Severe penalty for failing to catch a fake resume
-        reward   = -0.5
-        feedback = f"SEVERE PENALTY: Failed to detect gibberish/fake resume. Must reject nonsensical submissions. Ground Truth: {scenario['rationale']}"
+        reward   = 0.05
+        feedback = f"Failed to detect gibberish/fake resume. Ground Truth: {scenario['rationale']}"
 
     elif agent == "flag_for_review":
-        reward   = -0.1
-        feedback = f"Incorrect. Expected '{expected}', but you hedged. Ground Truth: {scenario['rationale']}"
+        reward   = 0.1
+        feedback = f"Incorrect hedging. Expected '{expected}'. Ground Truth: {scenario['rationale']}"
 
     else:
-        reward   = 0.0
-        feedback = f"Incorrect. Expected '{expected}', chose '{agent}'. Ground Truth: {scenario['rationale']}"
+        reward   = 0.05
+        feedback = f"Incorrect decision. Expected '{expected}', chose '{agent}'. Ground Truth: {scenario['rationale']}"
 
     return {"reward": float(reward), "is_correct": is_correct, "feedback": feedback}
 
