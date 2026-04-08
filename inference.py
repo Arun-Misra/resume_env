@@ -57,9 +57,10 @@ except ModuleNotFoundError:
     from client import ResumeEnv
 
 # --- MANDATORY CONFIGURATION ---
-IMAGE_NAME   = os.getenv("LOCAL_IMAGE_NAME", "resume_env")
+# --- MANDATORY CONFIGURATION ---
+IMAGE_NAME   = os.getenv("IMAGE_NAME", "resume_env")
 API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN") or "ollama"
-API_BASE_URL = os.getenv("API_BASE_URL") or "http://localhost:11434/v1"
+API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1" # Let it be None if not set, we'll handle fallback below
 MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK    = "resume_env"
 
