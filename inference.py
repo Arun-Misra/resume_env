@@ -231,18 +231,19 @@ async def run_episode(client: OpenAI, task: str) -> None:
     """Run one full episode for a given task difficulty."""
     log_start(task=task, env=BENCHMARK, model=MODEL_NAME)
 
-    if USE_LOCAL_SERVER:
-        env = ResumeEnv(base_url=LOCAL_SERVER_URL)
-    else:
-        env = await ResumeEnv.from_docker_image(IMAGE_NAME)
-
     history: List[str] = []
     rewards: List[float] = []
     steps_taken = 0
     score = 0.0
     success = False
+    env = None
 
     try:
+        if USE_LOCAL_SERVER:
+            env = ResumeEnv(base_url=LOCAL_SERVER_URL)
+        else:
+            env = await ResumeEnv.from_docker_image(IMAGE_NAME)
+
         result = await env.reset(task=task)
         obs = result.observation
 
@@ -281,11 +282,21 @@ async def run_episode(client: OpenAI, task: str) -> None:
         score   = min(max(score, 0.0), 1.0)       # clamp to [0, 1]
         success = score >= SUCCESS_SCORE_THRESHOLD
 
+    except Exception as exc:
+        log_step(
+            step=steps_taken + 1,
+            action="flag_for_review",
+            reward=0.0,
+            done=True,
+            error=str(exc),
+        )
+
     finally:
-        try:
-            await env.close()
-        except Exception:
-            pass
+        if env is not None:
+            try:
+                await env.close()
+            except Exception:
+                pass
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
 
 
