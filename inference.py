@@ -58,9 +58,9 @@ except ModuleNotFoundError:
 
 # --- MANDATORY CONFIGURATION ---
 IMAGE_NAME   = os.getenv("LOCAL_IMAGE_NAME", "resume_env")
-API_KEY      = os.getenv("HF_TOKEN") or os.getenv("API_KEY") or "ollama"
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1" or "http://localhost:11434/v1"
-MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct" or "gemma3:4b"
+API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN") or "ollama"
+API_BASE_URL = os.getenv("API_BASE_URL") or "http://localhost:11434/v1"
+MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK    = "resume_env"
 
 # --- EPISODE SETTINGS ---
